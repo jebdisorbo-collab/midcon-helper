@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mid Con Helper</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #000000;
+    --panel: #0a0a0a;
+    --border: #1a1a1a;
+    --orange: #ff6a00;
+    --orange-dim: #a84400;
+    --orange-glow: rgba(255,106,0,0.3);
+    --green: #00ff88;
+    --red: #ff2244;
+    --text: #e0e0e0;
+    --text-dim: #666;
+    --accent: #ff6a00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+  }
+
+  /* ─── NAV ─── */
+  #nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(0,0,0,0.95);
+    border-bottom: 1px solid var(--orange-dim);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 8px;
+    z-index: 100;
+  }
+  .nav-btn {
+    background: transparent;
+    border: 1px solid var(--orange-dim);
+    color: var(--text-dim);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 6px 18px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    border-color: var(--orange);
+    color: var(--orange);
+    box-shadow: 0 0 10px var(--orange-glow);
+  }
+  .nav-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: var(--orange);
+    letter-spacing: 4px;
+    margin-right: auto;
+  }
+
+  /* ─── PAGES ─── */
+  .page {
+    position: absolute;
+    top: 48px; left: 0; right: 0; bottom: 0;
+    display: none;
+    overflow: auto;
+  }
+  .page.active { display: flex; }
+
+  /* ═══════════════════════════════════════
+     PAGE 1 — TITLE
+  ═══════════════════════════════════════ */
+  #page1 {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+  .bg-text {
+    position: absolute;
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(60px, 10vw, 130px);
+    font-weight: 900;
+    color: rgba(255,106,0,0.06);
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    user-select: none;
+    white-space: nowrap;
+    text-align: center;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .title-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .title-main {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(32px, 5vw, 64px);
+    font-weight: 900;
+    color: var(--orange);
+    letter-spacing: 8px;
+    text-shadow: 0 0 40px var(--orange-glow), 0 0 80px var(--orange-glow);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%,100% { text-shadow: 0 0 40px var(--orange-glow), 0 0 80px var(--orange-glow); }
+    50% { text-shadow: 0 0 60px rgba(255,106,0,0.6), 0 0 120px rgba(255,106,0,0.4); }
+  }
+  .title-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--text-dim);
+    letter-spacing: 6px;
+    margin-top: 12px;
+    text-transform: uppercase;
+  }
+  .title-divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--orange), transparent);
+    margin: 24px auto;
+  }
+  #clock {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: clamp(28px, 4vw, 48px);
+    color: var(--text);
+    letter-spacing: 4px;
+  }
+  #dateline {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    color: var(--text-dim);
+    letter-spacing: 3px;
+    margin-top: 8px;
+  }
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(255,106,0,0.4), transparent);
+    animation: scan 6s linear infinite;
+    pointer-events: none;
+  }
+  @keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+
+  /* ═══════════════════════════════════════
+     PAGE 2 — PIPELINE DIAGRAM
+  ═══════════════════════════════════════ */
+  #page2 {
+    flex-direction: row;
+    padding: 16px;
+    gap: 14px;
+    align-items: stretch;
+    overflow: hidden;
+  }
+  #page2-left {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* ── SPREAD PANEL ── */
+  #spread-panel {
+    width: 240px;
+    flex-shrink: 0;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+  }
+  #spread-chart-wrap {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+  }
+  #spread-no-data {
+    color: #2a2a2a;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-align: center;
+    margin-top: 40px;
+    line-height: 1.8;
+  }
+  #spread-canvas { display: none; }
+  .spread-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 2px;
+    border-bottom: 1px solid #0d0d0d;
+    cursor: default;
+    transition: background 0.15s;
+    border-radius: 2px;
+  }
+  .spread-row:hover { background: rgba(255,255,255,0.025); }
+  .spread-row:last-child { border-bottom: none; }
+  .sr-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    white-space: nowrap;
+    width: 100px;
+    flex-shrink: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sr-from { color: #4488cc; }
+  .sr-arr  { color: #2a2a2a; }
+  .sr-to   { color: #cc7733; }
+  .sr-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: #0a0a0a;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+  }
+  .sr-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.4s ease, background 0.4s ease;
+    position: absolute;
+    top: 0;
+  }
+  .sr-value {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    width: 44px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+  #spread-sort-row {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    padding-top: 10px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    border-top: 1px solid #0d0d0d;
+    margin-top: 8px;
+  }
+  .spread-sort-btn {
+    background: transparent;
+    border: 1px solid #1e1e1e;
+    color: #333;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    padding: 3px 7px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.15s;
+  }
+  .spread-sort-btn:hover { border-color: #444; color: #666; }
+  .spread-sort-btn.active { border-color: var(--orange-dim); color: var(--orange); }
+  .section-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--orange);
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--orange-dim);
+    padding-bottom: 6px;
+    margin-bottom: 12px;
+  }
+  #diagram-panel {
+    flex: 1;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    position: relative;
+    min-height: 480px;
+    overflow: hidden;
+  }
+
+  /* SVG pipeline diagram */
+  #pipeline-svg {
+    width: 100%;
+    height: 100%;
+    min-height: 480px;
+  }
+
+  /* Node styles */
+  .node-receipt { fill: #00aaff; stroke: #0066cc; stroke-width: 2; }
+  .node-delivery { fill: #ff6a00; stroke: #aa4400; stroke-width: 2; }
+  .node-hub { fill: #ffcc00; stroke: #aa8800; stroke-width: 2; }
+  .node-label { font-family: 'Share Tech Mono', monospace; font-size: 11px; fill: #fff; }
+  .node-price { font-family: 'Share Tech Mono', monospace; font-size: 10px; fill: #aaa; }
+  .pipe-main { stroke: #ff6a00; stroke-width: 6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .pipe-branch { stroke: #ff6a00; stroke-width: 3; fill: none; stroke-linecap: round; }
+  .flow-line { stroke-width: 2; fill: none; opacity: 0.85; stroke-dasharray: none; }
+  .transport-box { fill: rgba(0,0,0,0.7); stroke: #333; stroke-width: 1; rx: 3; }
+  .transport-text { font-family: 'Share Tech Mono', monospace; font-size: 9px; fill: #888; cursor: pointer; }
+  .transport-input { font-family: 'Share Tech Mono', monospace; font-size: 9px; fill: #ff6a00; }
+
+  /* Price boxes */
+  .price-box {
+    position: absolute;
+    background: rgba(10,10,10,0.92);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    min-width: 90px;
+    pointer-events: none;
+  }
+  .price-box .pb-name { color: var(--text-dim); font-size: 9px; letter-spacing: 2px; }
+  .price-box .pb-price { color: var(--orange); font-size: 14px; font-weight: bold; margin-top: 2px; }
+  .price-box .pb-index { color: #555; font-size: 8px; margin-top: 2px; }
+
+  /* Data paste panel */
+  #paste-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    max-height: 260px;
+  }
+  .paste-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  #paste-input {
+    flex: 1;
+    background: #050505;
+    border: 1px solid #222;
+    border-radius: 3px;
+    color: #aaa;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    padding: 10px;
+    resize: vertical;
+    min-height: 100px;
+    outline: none;
+  }
+  #paste-input:focus { border-color: var(--orange-dim); }
+  .parse-btn {
+    background: transparent;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    white-space: nowrap;
+    transition: all 0.2s;
+    align-self: flex-start;
+  }
+  .parse-btn:hover { background: var(--orange-glow); box-shadow: 0 0 12px var(--orange-glow); }
+
+  #price-table {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .price-chip {
+    background: #080808;
+    border: 1px solid #1e1e1e;
+    border-radius: 3px;
+    padding: 4px 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+  }
+  .price-chip .pc-name { color: #555; font-size: 9px; }
+  .price-chip .pc-val { color: var(--orange); }
+
+  /* Transport cost inputs inside SVG (overlayed as HTML) */
+  .tcost-wrapper {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid #333;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+  }
+  .tcost-wrapper label { color: #555; font-size: 9px; }
+  .tcost-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #444;
+    color: var(--orange);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    width: 52px;
+    outline: none;
+    text-align: center;
+  }
+
+  /* Legend */
+  #legend {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.85);
+    border: 1px solid #1a1a1a;
+    border-radius: 4px;
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+  }
+  .leg-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; color: #666; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .leg-line { width: 24px; height: 3px; border-radius: 2px; }
+
+  /* ═══════════════════════════════════════
+     PAGE 3 — MAINTENANCE
+  ═══════════════════════════════════════ */
+  #page3 {
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+  .maint-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .fetch-btn {
+    background: transparent;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 8px 20px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+  }
+  .fetch-btn:hover { background: var(--orange-glow); box-shadow: 0 0 12px var(--orange-glow); }
+  #maint-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+  #piperiv-frame-wrap {
+    flex: 1;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    min-height: 0;
+  }
+  #piperiv-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: #fff;
+  }
+  .frame-overlay-label {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    pointer-events: none;
+    background: rgba(0,0,0,0.7);
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid #1a1a1a;
+  }
+
+  /* ─── HDD / CDD CARDS ─── */
+  #hdd-cdd-strip {
+    display: flex;
+    gap: 20px;
+    align-items: stretch;
+    justify-content: center;
+    margin-top: 28px;
+    position: relative;
+    z-index: 3;
+  }
+  .deg-card {
+    background: rgba(8,8,8,0.85);
+    border: 1px solid #1e1e1e;
+    border-radius: 6px;
+    padding: 16px 22px;
+    min-width: 160px;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    transition: border-color 0.3s;
+  }
+  .deg-card:hover { border-color: #333; }
+  .deg-card .dc-type {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .deg-card.hdd .dc-type { color: #4488ff; }
+  .deg-card.cdd .dc-type { color: #ff6a00; }
+  .deg-card .dc-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .deg-card.hdd .dc-value { color: #5599ff; }
+  .deg-card.cdd .dc-value { color: #ff8833; }
+  .deg-card .dc-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 1px;
+  }
+  .deg-card .dc-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #333;
+    margin-top: 6px;
+  }
+  /* cloud SVG decoration inside card */
+  .cloud-deco {
+    position: absolute;
+    right: -8px;
+    bottom: -6px;
+    opacity: 0.07;
+    pointer-events: none;
+  }
+  .deg-card.hdd .cloud-deco { opacity: 0.09; }
+
+  .deg-card .dc-bar-row {
+    display: flex;
+    gap: 3px;
+    margin-top: 10px;
+    align-items: flex-end;
+    height: 28px;
+  }
+  .dc-bar {
+    flex: 1;
+    border-radius: 2px 2px 0 0;
+    min-height: 2px;
+    transition: height 0.4s;
+  }
+  .deg-card.hdd .dc-bar { background: rgba(85,153,255,0.4); }
+  .deg-card.cdd .dc-bar { background: rgba(255,136,51,0.4); }
+  .dc-bar-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: #333;
+    text-align: center;
+    margin-top: 3px;
+    display: flex;
+    gap: 3px;
+    justify-content: space-between;
+  }
+  .dc-bar-lbl { flex:1; text-align:center; overflow:hidden; }
+
+  #hdd-cdd-location {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: #2a2a2a;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    text-align: center;
+    margin-top: 10px;
+    z-index: 3;
+  }
+
+  /* separator card */
+  .deg-sep {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 4px;
+  }
+  .deg-sep-line { width: 1px; height: 40px; background: #1a1a1a; }
+  .deg-sep-txt {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 8px;
+    color: #2a2a2a;
+    letter-spacing: 2px;
+    writing-mode: vertical-rl;
+  }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: #050505; }
+  ::-webkit-scrollbar-thumb { background: var(--orange-dim); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <span class="nav-title">MCH</span>
+  <button class="nav-btn active" onclick="showPage(1,this)">01 // OVERVIEW</button>
+  <button class="nav-btn" onclick="showPage(2,this)">02 // MIDSHIP</button>
+  <button class="nav-btn" onclick="showPage(3,this)">03 // MAINTENANCE</button>
+</nav>
+
+<!-- ═══ PAGE 1 ═══ -->
+<div id="page1" class="page active">
+  <div class="scan-line"></div>
+  <div class="bg-text" style="top:10%">MID CON</div>
+  <div class="bg-text" style="top:38%">HELPER</div>
+  <div class="bg-text" style="top:66%">MIDSHIP</div>
+  <div class="title-content">
+    <div class="title-main">MID CON HELPER</div>
+    <div class="title-sub">Natural Gas Scheduling Dashboard</div>
+    <div class="title-divider"></div>
+    <div id="clock">--:--:--</div>
+    <div id="dateline">--- --, ----</div>
+
+    <!-- HDD / CDD strip — inline below clock -->
+    <div id="hdd-cdd-strip">
+
+      <div class="deg-card hdd">
+        <div class="dc-type">⟆ Heating Degree Days</div>
+        <div class="dc-value" id="hdd-today">--</div>
+        <div class="dc-label">TODAY &nbsp;·&nbsp; BASE 65°F</div>
+        <div class="dc-sub" id="hdd-week-total">7-day: --</div>
+        <div class="dc-bar-row" id="hdd-bars"></div>
+        <div class="dc-bar-label" id="hdd-bar-labels"></div>
+        <svg class="cloud-deco" width="110" height="72" viewBox="0 0 110 72" fill="none">
+          <ellipse cx="55" cy="52" rx="46" ry="18" fill="#4488ff"/>
+          <ellipse cx="36" cy="44" rx="22" ry="20" fill="#4488ff"/>
+          <ellipse cx="62" cy="38" rx="26" ry="24" fill="#4488ff"/>
+          <ellipse cx="82" cy="46" rx="18" ry="16" fill="#4488ff"/>
+          <line x1="30" y1="12" x2="30" y2="28" stroke="#99bbff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="22" y1="20" x2="38" y2="20" stroke="#99bbff" stroke-width="1.5" opacity="0.5"/>
+          <line x1="24" y1="14" x2="36" y2="26" stroke="#99bbff" stroke-width="1" opacity="0.4"/>
+          <line x1="36" y1="14" x2="24" y2="26" stroke="#99bbff" stroke-width="1" opacity="0.4"/>
+          <line x1="70" y1="8" x2="70" y2="22" stroke="#99bbff" stroke-width="1.5" opacity="0.4"/>
+          <line x1="63" y1="15" x2="77" y2="15" stroke="#99bbff" stroke-width="1.5" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <div class="deg-sep">
+        <div class="deg-sep-line"></div>
+        <div class="deg-sep-txt">MID-CON</div>
+        <div class="deg-sep-line"></div>
+      </div>
+
+      <div class="deg-card cdd">
+        <div class="dc-type">☀ Cooling Degree Days</div>
+        <div class="dc-value" id="cdd-today">--</div>
+        <div class="dc-label">TODAY &nbsp;·&nbsp; BASE 65°F</div>
+        <div class="dc-sub" id="cdd-week-total">7-day: --</div>
+        <div class="dc-bar-row" id="cdd-bars"></div>
+        <div class="dc-bar-label" id="cdd-bar-labels"></div>
+        <svg class="cloud-deco" width="110" height="72" viewBox="0 0 110 72" fill="none">
+          <ellipse cx="55" cy="52" rx="46" ry="18" fill="#ff6a00"/>
+          <ellipse cx="36" cy="44" rx="22" ry="20" fill="#ff6a00"/>
+          <ellipse cx="62" cy="38" rx="26" ry="24" fill="#ff6a00"/>
+          <ellipse cx="82" cy="46" rx="18" ry="16" fill="#ff6a00"/>
+          <circle cx="28" cy="16" r="7" fill="#ffcc44" opacity="0.6"/>
+          <line x1="28" y1="4" x2="28" y2="8" stroke="#ffcc44" stroke-width="1.5" opacity="0.5"/>
+          <line x1="28" y1="24" x2="28" y2="28" stroke="#ffcc44" stroke-width="1.5" opacity="0.5"/>
+          <line x1="16" y1="16" x2="20" y2="16" stroke="#ffcc44" stroke-width="1.5" opacity="0.5"/>
+          <line x1="36" y1="16" x2="40" y2="16" stroke="#ffcc44" stroke-width="1.5" opacity="0.5"/>
+          <line x1="19" y1="7" x2="22" y2="10" stroke="#ffcc44" stroke-width="1" opacity="0.4"/>
+          <line x1="37" y1="7" x2="34" y2="10" stroke="#ffcc44" stroke-width="1" opacity="0.4"/>
+          <line x1="19" y1="25" x2="22" y2="22" stroke="#ffcc44" stroke-width="1" opacity="0.4"/>
+          <line x1="37" y1="25" x2="34" y2="22" stroke="#ffcc44" stroke-width="1" opacity="0.4"/>
+        </svg>
+      </div>
+
+    </div>
+    <div id="hdd-cdd-location">LOADING WEATHER DATA…</div>
+  </div>
+</div>
+
+<!-- ═══ PAGE 2 ═══ -->
+<div id="page2" class="page">
+<div id="page2-left">
+  <div id="diagram-panel">
+    <svg id="pipeline-svg" viewBox="0 0 1300 600" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <filter id="glow-orange">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-green">
+          <feGaussianBlur stdDeviation="2" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <marker id="arrow-green" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#00ff88"/>
+        </marker>
+        <marker id="arrow-red" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#ff2244"/>
+        </marker>
+        <marker id="arrow-neutral" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#555"/>
+        </marker>
+      </defs>
+
+      <!-- ── MAIN PIPELINE PATH ── -->
+      <path class="pipe-main" filter="url(#glow-orange)"
+        d="M 680,60 C 600,60 560,65 530,80
+           L 300,85 L 270,100
+           C 250,115 245,130 245,155
+           L 250,230 L 252,280 L 255,330
+           C 258,355 265,370 275,385
+           L 310,420 L 370,450
+           C 420,470 500,480 580,482
+           L 680,480 L 760,475
+           C 820,470 870,460 920,455
+           L 970,452 L 1020,450"
+      />
+
+      <!-- SSC/NGPL fork — shared stem then two separate branches -->
+      <path class="pipe-branch" d="M 255,330 L 205,360"/>
+      <path class="pipe-branch" d="M 205,360 L 125,320"/>
+      <path class="pipe-branch" d="M 205,360 L 140,440"/>
+
+      <!-- Bennington fan branches — spread vertically to each delivery node -->
+      <!-- EOIT-D: top -->
+      <path class="pipe-branch" d="M 1020,450 C 1060,440 1100,340 1150,160"/>
+      <!-- Arkhoma -->
+      <path class="pipe-branch" d="M 1020,450 C 1070,445 1110,390 1150,310"/>
+      <!-- MEP -->
+      <path class="pipe-branch" d="M 1020,450 C 1070,450 1110,450 1150,450"/>
+      <!-- NGPL-D: bottom -->
+      <path class="pipe-branch" d="M 1020,450 C 1070,460 1110,520 1150,560"/>
+
+      <!-- ── FLOW LINES (drawn by JS) ── -->
+      <g id="flow-lines"></g>
+
+      <!-- ── RECEIPT NODES (top) ── -->
+      <g id="node-PEPL" transform="translate(300,85)">
+        <circle r="10" class="node-receipt"/>
+        <text x="0" y="-16" text-anchor="middle" class="node-label">PEPL</text>
+        <text x="0" y="-4" text-anchor="middle" class="node-price" id="diag-price-PEPL">--</text>
+      </g>
+      <g id="node-OGT" transform="translate(420,82)">
+        <circle r="10" class="node-receipt"/>
+        <text x="0" y="-16" text-anchor="middle" class="node-label">OGT</text>
+        <text x="0" y="-4" text-anchor="middle" class="node-price" id="diag-price-OGT">--</text>
+      </g>
+      <g id="node-EOIT" transform="translate(530,80)">
+        <circle r="10" class="node-receipt"/>
+        <text x="0" y="-16" text-anchor="middle" class="node-label">EOIT</text>
+        <text x="0" y="-4" text-anchor="middle" class="node-price" id="diag-price-EOIT">--</text>
+      </g>
+      <g id="node-EGT" transform="translate(640,72)">
+        <circle r="10" class="node-receipt"/>
+        <text x="0" y="-16" text-anchor="middle" class="node-label">EGT</text>
+        <text x="0" y="-4" text-anchor="middle" class="node-price" id="diag-price-EGT">--</text>
+      </g>
+
+      <!-- ── SSC + NGPL receipt (left fork — spread apart) ── -->
+      <!-- NGPL: upper-left branch -->
+      <g id="node-NGPL-R" transform="translate(108,318)">
+        <circle r="10" class="node-receipt"/>
+        <text x="-14" y="4" text-anchor="end" class="node-label">NGPL</text>
+        <text x="-14" y="17" text-anchor="end" class="node-price" id="diag-price-NGPL-R">--</text>
+      </g>
+      <!-- SSC: lower-left branch -->
+      <g id="node-SSC" transform="translate(123,448)">
+        <circle r="10" class="node-receipt"/>
+        <text x="-14" y="4" text-anchor="end" class="node-label">SSC</text>
+        <text x="-14" y="17" text-anchor="end" class="node-price" id="diag-price-SSC">--</text>
+      </g>
+
+      <!-- ── BENNINGTON HUB ── -->
+      <g id="node-BENN" transform="translate(1020,450)">
+        <rect x="-16" y="-16" width="32" height="32" fill="#ffcc00" stroke="#aa8800" stroke-width="2" rx="3"/>
+        <text x="0" y="34" text-anchor="middle" class="node-label" style="fill:#ffcc00;font-size:12px">BENNINGTON</text>
+      </g>
+
+      <!-- ── DELIVERY NODES — spread vertically on right side ── -->
+      <!-- EOIT delivery — top -->
+      <g id="node-EOIT-D" transform="translate(1150,160)">
+        <circle r="12" class="node-delivery"/>
+        <text x="18" y="-6" text-anchor="start" class="node-label">EOIT</text>
+        <text x="18" y="8" text-anchor="start" class="node-price" id="diag-price-EOIT-D">--</text>
+      </g>
+      <!-- Arkhoma -->
+      <g id="node-Arkhoma" transform="translate(1150,310)">
+        <circle r="12" class="node-delivery"/>
+        <text x="18" y="-6" text-anchor="start" class="node-label">Arkhoma</text>
+        <text x="18" y="8" text-anchor="start" class="node-price" id="diag-price-Arkhoma">--</text>
+      </g>
+      <!-- MEP -->
+      <g id="node-MEP" transform="translate(1150,450)">
+        <circle r="12" class="node-delivery"/>
+        <text x="18" y="-6" text-anchor="start" class="node-label">MEP</text>
+        <text x="18" y="8" text-anchor="start" class="node-price" id="diag-price-MEP">--</text>
+      </g>
+      <!-- NGPL delivery — bottom -->
+      <g id="node-NGPL-D" transform="translate(1150,560)">
+        <circle r="12" class="node-delivery"/>
+        <text x="18" y="-6" text-anchor="start" class="node-label">NGPL</text>
+        <text x="18" y="8" text-anchor="start" class="node-price" id="diag-price-NGPL-D">--</text>
+      </g>
+
+      <!-- Vertical "delivery spine" line connecting the 4 delivery nodes -->
+      <line x1="1150" y1="160" x2="1150" y2="560" stroke="#2a2a2a" stroke-width="2" stroke-dasharray="4 4"/>
+
+      <!-- ── LEGEND ── -->
+      <g transform="translate(20,500)">
+        <rect x="0" y="-12" width="190" height="70" fill="rgba(0,0,0,0.8)" rx="4" stroke="#1a1a1a"/>
+        <circle cx="16" cy="4" r="8" class="node-receipt"/>
+        <text x="30" y="8" class="node-label" style="font-size:10px;fill:#aaa">Receipt Point</text>
+        <circle cx="16" cy="24" r="8" class="node-delivery"/>
+        <text x="30" y="28" class="node-label" style="font-size:10px;fill:#aaa">Delivery Point</text>
+        <rect x="8" y="34" width="16" height="16" fill="#ffcc00" stroke="#aa8800" stroke-width="1.5" rx="2"/>
+        <text x="30" y="46" class="node-label" style="font-size:10px;fill:#aaa">Hub / Interconnect</text>
+        <line x1="8" y1="56" x2="24" y2="56" stroke="#00ff88" stroke-width="2"/>
+        <text x="30" y="60" class="node-label" style="font-size:10px;fill:#aaa">Profitable Flow</text>
+      </g>
+
+    </svg>
+
+    <!-- Transport cost inputs overlaid on diagram -->
+    <div id="tcost-overlays"></div>
+  </div>
+
+  <!-- Paste / Price Update Panel -->
+  <div id="paste-panel">
+    <div class="section-label">// Price Data Feed — Paste from Excel</div>
+    <div class="paste-row">
+      <textarea id="paste-input" placeholder="Paste price data here (e.g.  PEPL  2.345  OGT  2.512 ...)&#10;Accepts tab-separated or space-separated values from Excel copy."></textarea>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button class="parse-btn" onclick="parsePrices()">▶ UPDATE PRICES</button>
+        <button class="parse-btn" style="border-color:#444;color:#555" onclick="clearPrices()">✕ CLEAR</button>
+      </div>
+    </div>
+    <div id="price-table"></div>
+  </div>
+</div><!-- end page2-left -->
+
+<!-- ── SPREAD CHART PANEL ── -->
+<div id="spread-panel">
+  <div class="section-label">// SPREADS &nbsp;<span id="spread-subtitle" style="color:#333;font-size:9px;letter-spacing:1px">DELIVERY − RECEIPT − TRANSPORT</span></div>
+  <div id="spread-chart-wrap">
+    <div id="spread-no-data">Enter prices to<br>see spreads</div>
+    <canvas id="spread-canvas"></canvas>
+  </div>
+  <div id="spread-sort-row">
+    <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:#333;letter-spacing:1px">SORT:</span>
+    <button class="spread-sort-btn active" onclick="setSpreadSort('spread',this)">VALUE</button>
+    <button class="spread-sort-btn" onclick="setSpreadSort('receipt',this)">RECEIPT</button>
+    <button class="spread-sort-btn" onclick="setSpreadSort('delivery',this)">DELIVERY</button>
+  </div>
+</div>
+
+</div><!-- end page2 -->
+
+<!-- ═══ PAGE 3 ═══ -->
+<div id="page3" class="page">
+  <div class="maint-header">
+    <div>
+      <div class="section-label" style="margin-bottom:4px">// MIDSHIP PIPELINE — CRITICAL NOTICES</div>
+      <div id="maint-status">Live feed via PipeRiv — piperiv.com</div>
+    </div>
+    <a class="fetch-btn" href="https://www.piperiv.com/ip/midship/critical-notices" target="_blank" rel="noopener">
+      ↗ OPEN IN BROWSER
+    </a>
+  </div>
+  <div id="piperiv-frame-wrap">
+    <iframe
+      id="piperiv-frame"
+      src="https://www.piperiv.com/ip/midship/critical-notices"
+      title="Midship Pipeline Critical Notices — PipeRiv"
+      sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+      loading="lazy"
+    ></iframe>
+    <div class="frame-overlay-label">SOURCE: PIPERIV.COM</div>
+  </div>
+</div>
+
+<script>
+// ─── PAGE NAVIGATION ───────────────────────────────────────────────────
+function showPage(n, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page' + n).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ─── CLOCK ─────────────────────────────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const t = now.toLocaleTimeString('en-US', {hour12: false});
+  const d = now.toLocaleDateString('en-US', {weekday:'long', year:'numeric', month:'long', day:'numeric'});
+  document.getElementById('clock').textContent = t;
+  document.getElementById('dateline').textContent = d.toUpperCase();
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── PRICE STATE ───────────────────────────────────────────────────────
+// Mapping: index name → which price key to use
+const priceMap = {
+  'PEPL':    { key: 'PEPL',        label: 'PEPL',         side: 'receipt' },
+  'OGT':     { key: 'OGT',         label: 'OGT',          side: 'receipt' },
+  'EOIT':    { key: 'PEPL',        label: 'PEPL',         side: 'receipt' },
+  'EGT':     { key: 'FLEX',        label: 'Flex',         side: 'receipt' },
+  'SSC':     { key: 'SSC',         label: 'SSC',          side: 'receipt' },
+  'NGPL-R':  { key: 'NGPL_TEXOK',  label: 'NGPL Tex Ok',  side: 'receipt' },
+  'Arkhoma': { key: 'OGT',         label: 'OGT',          side: 'delivery' },
+  'MEP':     { key: 'TRANSCO',     label: 'Transco',      side: 'delivery' },
+  'NGPL-D':  { key: 'NGPL_TEXOK',  label: 'NGPL Tex Ok',  side: 'delivery' },
+  'EOIT-D':  { key: 'PEPL',        label: 'PEPL',         side: 'delivery' },
+};
+
+let prices = {}; // key → numeric value
+
+function getPrice(node) {
+  const m = priceMap[node];
+  if (!m) return null;
+  return prices[m.key] !== undefined ? prices[m.key] : null;
+}
+
+// ─── FLOW LINE DEFINITIONS ──────────────────────────────────────────────
+// Each: [receipt, delivery, midX, midY] for transport cost overlay
+const flowDefs = [
+  // PEPL → deliveries
+  { from: 'PEPL',   to: 'EOIT-D',  mid: [700, 200] },
+  { from: 'PEPL',   to: 'Arkhoma', mid: [680, 260] },
+  { from: 'PEPL',   to: 'MEP',     mid: [660, 340] },
+  { from: 'PEPL',   to: 'NGPL-D',  mid: [640, 420] },
+  // OGT → deliveries
+  { from: 'OGT',    to: 'EOIT-D',  mid: [760, 195] },
+  { from: 'OGT',    to: 'Arkhoma', mid: [740, 255] },
+  { from: 'OGT',    to: 'MEP',     mid: [730, 340] },
+  { from: 'OGT',    to: 'NGPL-D',  mid: [720, 430] },
+  // EOIT → deliveries
+  { from: 'EOIT',   to: 'EOIT-D',  mid: [830, 185] },
+  { from: 'EOIT',   to: 'Arkhoma', mid: [820, 250] },
+  { from: 'EOIT',   to: 'MEP',     mid: [810, 340] },
+  { from: 'EOIT',   to: 'NGPL-D',  mid: [800, 440] },
+  // EGT → deliveries
+  { from: 'EGT',    to: 'EOIT-D',  mid: [900, 175] },
+  { from: 'EGT',    to: 'Arkhoma', mid: [890, 240] },
+  { from: 'EGT',    to: 'MEP',     mid: [880, 340] },
+  { from: 'EGT',    to: 'NGPL-D',  mid: [870, 450] },
+  // SSC → deliveries
+  { from: 'SSC',    to: 'EOIT-D',  mid: [580, 300] },
+  { from: 'SSC',    to: 'Arkhoma', mid: [600, 370] },
+  { from: 'SSC',    to: 'MEP',     mid: [640, 440] },
+  { from: 'SSC',    to: 'NGPL-D',  mid: [680, 510] },
+  // NGPL-R → deliveries
+  { from: 'NGPL-R', to: 'EOIT-D',  mid: [560, 280] },
+  { from: 'NGPL-R', to: 'Arkhoma', mid: [580, 350] },
+  { from: 'NGPL-R', to: 'MEP',     mid: [610, 420] },
+  { from: 'NGPL-R', to: 'NGPL-D',  mid: [640, 490] },
+];
+
+// Node center positions (matching SVG transforms)
+const nodeCenters = {
+  'PEPL':    [300,  85],
+  'OGT':     [420,  82],
+  'EOIT':    [530,  80],
+  'EGT':     [640,  72],
+  'SSC':     [123, 448],
+  'NGPL-R':  [108, 318],
+  'Arkhoma': [1150, 310],
+  'MEP':     [1150, 450],
+  'NGPL-D':  [1150, 560],
+  'EOIT-D':  [1150, 160],
+  'BENN':    [1020, 450],
+};
+
+// transport costs state
+let transportCosts = {};
+flowDefs.forEach((f,i) => transportCosts[i] = 0);
+
+function flowColor(receipt, delivery) {
+  const rp = getPrice(receipt);
+  const dp = getPrice(delivery);
+  const tc = transportCosts[flowDefs.findIndex(f=>f.from===receipt&&f.to===delivery)] || 0;
+  if (rp === null || dp === null) return '#444';
+  const spread = dp - rp - tc;
+  if (spread > 0.05) {
+    const intensity = Math.min(1, spread / 0.3);
+    const g = Math.round(100 + intensity * 155);
+    return `rgb(0,${g},${Math.round(50+intensity*38)})`;
+  } else if (spread < -0.05) {
+    const intensity = Math.min(1, Math.abs(spread) / 0.3);
+    const r = Math.round(100 + intensity * 155);
+    return `rgb(${r},${Math.round(20+intensity*24)},${Math.round(40+intensity*24)})`;
+  }
+  return '#444';
+}
+
+function drawFlowLines() {
+  const g = document.getElementById('flow-lines');
+  g.innerHTML = '';
+  flowDefs.forEach((fd, i) => {
+    const rc = nodeCenters[fd.from];
+    const dc = nodeCenters[fd.to];
+    if (!rc || !dc) return;
+    const col = flowColor(fd.from, fd.to);
+    const spread = (() => {
+      const rp = getPrice(fd.from);
+      const dp = getPrice(fd.to);
+      const tc = transportCosts[i] || 0;
+      return (rp !== null && dp !== null) ? (dp - rp - tc) : null;
+    })();
+    const markerEnd = spread === null ? 'url(#arrow-neutral)' : (spread > 0.05 ? 'url(#arrow-green)' : (spread < -0.05 ? 'url(#arrow-red)' : 'url(#arrow-neutral)'));
+    const line = document.createElementNS('http://www.w3.org/2000/svg','path');
+    // Curve through midpoint
+    const mx = fd.mid[0], my = fd.mid[1];
+    const d = `M${rc[0]},${rc[1]} Q${mx},${my} ${dc[0]},${dc[1]}`;
+    line.setAttribute('d', d);
+    line.setAttribute('class', 'flow-line');
+    line.setAttribute('stroke', col);
+    line.setAttribute('stroke-dasharray', 'none');
+    line.setAttribute('marker-end', markerEnd);
+    line.setAttribute('data-from', fd.from);
+    line.setAttribute('data-to', fd.to);
+    line.setAttribute('opacity', '0.7');
+    // Wider invisible hit area for easier hover
+    line.style.cursor = 'crosshair';
+    line.style.strokeWidth = '2';
+    line.style.pointerEvents = 'stroke';
+    // Hover events
+    line.addEventListener('mouseenter', (e) => showFlowTooltip(e, fd, spread, col));
+    line.addEventListener('mousemove',  (e) => moveFlowTooltip(e));
+    line.addEventListener('mouseleave', ()  => hideFlowTooltip());
+    g.appendChild(line);
+
+    // Invisible thick overlay for easier hover detection
+    const hitLine = document.createElementNS('http://www.w3.org/2000/svg','path');
+    hitLine.setAttribute('d', d);
+    hitLine.setAttribute('fill', 'none');
+    hitLine.setAttribute('stroke', 'transparent');
+    hitLine.setAttribute('stroke-width', '14');
+    hitLine.style.cursor = 'crosshair';
+    hitLine.style.pointerEvents = 'stroke';
+    hitLine.addEventListener('mouseenter', (e) => showFlowTooltip(e, fd, spread, col));
+    hitLine.addEventListener('mousemove',  (e) => moveFlowTooltip(e));
+    hitLine.addEventListener('mouseleave', ()  => hideFlowTooltip());
+    g.appendChild(hitLine);
+  });
+}
+
+// ─── FLOW TOOLTIP ───────────────────────────────────────────────────────
+const flowTooltip = (() => {
+  const el = document.createElement('div');
+  el.id = 'flow-tooltip';
+  el.style.cssText = `
+    position: fixed;
+    display: none;
+    pointer-events: none;
+    z-index: 9999;
+    background: rgba(4,4,4,0.96);
+    border: 1px solid #2a2a2a;
+    border-radius: 5px;
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: #ccc;
+    min-width: 180px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+    line-height: 1.7;
+  `;
+  document.body.appendChild(el);
+  return el;
+})();
+
+function showFlowTooltip(e, fd, spread, col) {
+  const rp = getPrice(fd.from);
+  const dp = getPrice(fd.to);
+  const tc = transportCosts[flowDefs.indexOf(fd)] || 0;
+
+  const spreadStr = spread !== null
+    ? (spread >= 0 ? '+' : '') + spread.toFixed(3)
+    : '—';
+  const spreadColor = spread === null ? '#555' : (spread > 0.05 ? '#00ff88' : (spread < -0.05 ? '#ff2244' : '#888'));
+
+  const fromLabel = priceMap[fd.from]?.label || fd.from;
+  const toLabel   = priceMap[fd.to]?.label   || fd.to;
+
+  flowTooltip.innerHTML = `
+    <div style="color:#ff6a00;font-size:10px;letter-spacing:2px;margin-bottom:6px;border-bottom:1px solid #1a1a1a;padding-bottom:5px">FLOW DETAILS</div>
+    <div><span style="color:#555">RECEIPT &nbsp;</span> <span style="color:#5599ff">${fd.from}</span> <span style="color:#333;font-size:9px">(${fromLabel})</span></div>
+    <div><span style="color:#555">DELIVERY</span> <span style="color:#ff8833">${fd.to}</span> <span style="color:#333;font-size:9px">(${toLabel})</span></div>
+    <div style="border-top:1px solid #1a1a1a;margin-top:6px;padding-top:6px">
+      <span style="color:#555">RCPT PRICE &nbsp;</span><span>${rp !== null ? '$' + rp.toFixed(3) : '—'}</span>
+    </div>
+    <div><span style="color:#555">DLVR PRICE &nbsp;</span><span>${dp !== null ? '$' + dp.toFixed(3) : '—'}</span></div>
+    <div><span style="color:#555">TRANSPORT &nbsp;</span><span>${tc > 0 ? '$' + tc.toFixed(3) : '—'}</span></div>
+    <div style="border-top:1px solid #1a1a1a;margin-top:6px;padding-top:6px;font-size:13px">
+      <span style="color:#555">SPREAD &nbsp;&nbsp;&nbsp;&nbsp;</span><span style="color:${spreadColor};font-weight:bold">${spreadStr}</span>
+    </div>
+  `;
+  flowTooltip.style.display = 'block';
+  moveFlowTooltip(e);
+}
+
+function moveFlowTooltip(e) {
+  const pad = 16;
+  const tw = flowTooltip.offsetWidth;
+  const th = flowTooltip.offsetHeight;
+  let x = e.clientX + pad;
+  let y = e.clientY + pad;
+  if (x + tw > window.innerWidth  - 8) x = e.clientX - tw - pad;
+  if (y + th > window.innerHeight - 8) y = e.clientY - th - pad;
+  flowTooltip.style.left = x + 'px';
+  flowTooltip.style.top  = y + 'px';
+}
+
+function hideFlowTooltip() {
+  flowTooltip.style.display = 'none';
+}
+
+function updateDiagramPrices() {
+  Object.keys(priceMap).forEach(node => {
+    const el = document.getElementById('diag-price-' + node);
+    if (!el) return;
+    const p = getPrice(node);
+    el.textContent = p !== null ? '$' + p.toFixed(3) : '--';
+    el.setAttribute('fill', p !== null ? '#ff6a00' : '#555');
+  });
+  drawFlowLines();
+  renderSpreadPanel();
+}
+
+// ─── TRANSPORT COST OVERLAYS ────────────────────────────────────────────
+function buildTransportOverlays() {
+  const container = document.getElementById('tcost-overlays');
+  container.innerHTML = '';
+  const svg = document.getElementById('pipeline-svg');
+  const vb = svg.viewBox.baseVal;
+
+  flowDefs.forEach((fd, i) => {
+    const rc = nodeCenters[fd.from];
+    const dc = nodeCenters[fd.to];
+    if (!rc || !dc) return;
+
+    const mx = fd.mid[0], my = fd.mid[1];
+
+    // Convert SVG coords to %, since we use viewBox
+    const px = (mx / vb.width) * 100;
+    const py = (my / vb.height) * 100;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'tcost-wrapper';
+    wrap.style.left = px + '%';
+    wrap.style.top = py + '%';
+    wrap.style.transform = 'translate(-50%,-50%)';
+    wrap.style.display = 'none'; // hidden by default, show on hover/focus
+    wrap.dataset.idx = i;
+
+    wrap.innerHTML = `<label>TC</label><input class="tcost-input" type="number" step="0.001" min="0" value="0" data-idx="${i}" placeholder="0.000" title="${fd.from}→${fd.to}"/>`;
+    wrap.querySelector('input').addEventListener('change', function() {
+      transportCosts[this.dataset.idx] = parseFloat(this.value) || 0;
+      updateDiagramPrices();
+    });
+    container.appendChild(wrap);
+  });
+}
+
+// Show transport inputs on SVG hover - simplified: show all on panel hover
+document.addEventListener('DOMContentLoaded', () => {
+  buildTransportOverlays();
+  updateDiagramPrices();
+  renderPriceTable();
+});
+
+const diagramPanel = document.getElementById('diagram-panel');
+let tcostVisible = false;
+diagramPanel && diagramPanel.addEventListener('dblclick', () => {
+  tcostVisible = !tcostVisible;
+  document.querySelectorAll('.tcost-wrapper').forEach(w => {
+    w.style.display = tcostVisible ? 'flex' : 'none';
+  });
+});
+
+// ─── PRICE PARSING ──────────────────────────────────────────────────────
+// Maps any reasonable variation of a name → internal price key
+function normaliseKey(raw) {
+  const s = raw.toUpperCase().trim().replace(/\s+/g, ' ');
+  if (s === 'PEPL')                                              return 'PEPL';
+  if (s === 'OGT')                                               return 'OGT';
+  if (s === 'FLEX' || s === 'FLEXIBLE' || s === 'EGT'
+      || s === 'FLEX PRICE' || s === 'FLEX INDEX')               return 'FLEX';
+  if (s === 'SSC')                                               return 'SSC';
+  if (s.includes('NGPL') || s.includes('TEXOK')
+      || s.includes('TEX OK') || s.includes('TEX-OK'))          return 'NGPL_TEXOK';
+  if (s === 'TRANSCO' || s.includes('TRANSCO')
+      || s.includes('TRANS') || s === 'MEP')                    return 'TRANSCO';
+  return null;
+}
+
+function parsePrices() {
+  const raw = document.getElementById('paste-input').value;
+  if (!raw.trim()) return;
+
+  const parsed = {};
+
+  // Process line by line — handles formats:
+  //   "Transco $2.94"   "NGPL TexOk $2.45"   "PEPL  2.24"   "Flex $2.66"
+  const lines = raw.split(/\n/).map(l => l.trim()).filter(Boolean);
+  lines.forEach(line => {
+    // Strip any trailing whitespace, find the last number (with optional leading $)
+    const priceMatch = line.match(/\$?\s*(\d+\.\d+)\s*$/);
+    if (!priceMatch) return;
+    const val = parseFloat(priceMatch[1]);
+    if (isNaN(val) || val <= 0 || val > 50) return;
+
+    // Everything before the price token is the name
+    const nameRaw = line.slice(0, line.lastIndexOf(priceMatch[0])).trim().replace(/[:\-–]+$/, '').trim();
+    const key = normaliseKey(nameRaw);
+    if (key) parsed[key] = val;
+  });
+
+  if (Object.keys(parsed).length === 0) {
+    // Fallback: tab/space separated pairs on same line e.g. "PEPL\t2.24"
+    const tokens = raw.split(/[\t\s,]+/).filter(Boolean);
+    for (let i = 0; i < tokens.length - 1; i++) {
+      const val = parseFloat(tokens[i+1].replace('$',''));
+      if (!isNaN(val) && val > 0 && val < 50) {
+        const key = normaliseKey(tokens[i]);
+        if (key) { parsed[key] = val; i++; }
+      }
+    }
+  }
+
+  Object.assign(prices, parsed);
+  updateDiagramPrices();
+  renderPriceTable();
+}
+
+function clearPrices() {
+  prices = {};
+  document.getElementById('paste-input').value = '';
+  updateDiagramPrices();
+  renderPriceTable();
+}
+
+function renderPriceTable() {
+  const el = document.getElementById('price-table');
+  el.innerHTML = '';
+  const displayKeys = [
+    { key: 'PEPL',       label: 'PEPL' },
+    { key: 'OGT',        label: 'OGT' },
+    { key: 'FLEX',       label: 'Flex (EGT)' },
+    { key: 'SSC',        label: 'SSC' },
+    { key: 'NGPL_TEXOK', label: 'NGPL Tex Ok' },
+    { key: 'TRANSCO',    label: 'Transco (MEP)' },
+  ];
+  displayKeys.forEach(dk => {
+    const chip = document.createElement('div');
+    chip.className = 'price-chip';
+    const val = prices[dk.key];
+    chip.innerHTML = `<div class="pc-name">${dk.label}</div><div class="pc-val">${val !== undefined ? '$' + val.toFixed(3) : '—'}</div>`;
+    el.appendChild(chip);
+  });
+}
+
+// ─── SPREAD PANEL ───────────────────────────────────────────────────────
+let spreadSortMode = 'spread'; // 'spread' | 'receipt' | 'delivery'
+
+function setSpreadSort(mode, btn) {
+  spreadSortMode = mode;
+  document.querySelectorAll('.spread-sort-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderSpreadPanel();
+}
+
+function renderSpreadPanel() {
+  const wrap = document.getElementById('spread-chart-wrap');
+  const noData = document.getElementById('spread-no-data');
+
+  // Build spread data for all flows
+  const rows = flowDefs.map((fd, i) => {
+    const rp = getPrice(fd.from);
+    const dp = getPrice(fd.to);
+    const tc = transportCosts[i] || 0;
+    const spread = (rp !== null && dp !== null) ? (dp - rp - tc) : null;
+    return { from: fd.from, to: fd.to, spread, rp, dp, tc };
+  }).filter(r => r.spread !== null);
+
+  if (rows.length === 0) {
+    noData.style.display = 'block';
+    // Remove any existing rows
+    wrap.querySelectorAll('.spread-row').forEach(el => el.remove());
+    return;
+  }
+  noData.style.display = 'none';
+
+  // Sort
+  if (spreadSortMode === 'spread') {
+    rows.sort((a, b) => b.spread - a.spread);
+  } else if (spreadSortMode === 'receipt') {
+    rows.sort((a, b) => a.from.localeCompare(b.from));
+  } else {
+    rows.sort((a, b) => a.to.localeCompare(b.to));
+  }
+
+  // Max absolute spread for bar scaling
+  const maxAbs = Math.max(...rows.map(r => Math.abs(r.spread)), 0.01);
+
+  // Clear old rows
+  wrap.querySelectorAll('.spread-row').forEach(el => el.remove());
+
+  rows.forEach(r => {
+    const isPos = r.spread > 0.005;
+    const isNeg = r.spread < -0.005;
+    const barColor = isPos ? '#00cc66' : isNeg ? '#cc2244' : '#444';
+    const valColor = isPos ? '#00ff88' : isNeg ? '#ff2244' : '#888';
+    const barPct = Math.min(100, (Math.abs(r.spread) / maxAbs) * 100);
+    // For positive bars: anchor left. For negative: anchor right.
+    const barLeft = isNeg ? `${100 - barPct}%` : '0%';
+
+    const row = document.createElement('div');
+    row.className = 'spread-row';
+    row.title = `${r.from} → ${r.to}  |  Rcpt: $${r.rp.toFixed(3)}  Dlvr: $${r.dp.toFixed(3)}  TC: $${r.tc.toFixed(3)}`;
+    row.innerHTML = `
+      <div class="sr-label">
+        <span class="sr-from">${r.from}</span>
+        <span class="sr-arr"> ▶ </span>
+        <span class="sr-to">${r.to}</span>
+      </div>
+      <div class="sr-bar-wrap">
+        <div class="sr-bar" style="width:${barPct}%;left:${barLeft};background:${barColor};"></div>
+      </div>
+      <div class="sr-value" style="color:${valColor}">${r.spread >= 0 ? '+' : ''}${r.spread.toFixed(3)}</div>
+    `;
+
+    // Highlight the matching flow line on hover
+    row.addEventListener('mouseenter', () => highlightFlow(r.from, r.to, true));
+    row.addEventListener('mouseleave', () => highlightFlow(r.from, r.to, false));
+
+    wrap.appendChild(row);
+  });
+}
+
+function highlightFlow(from, to, on) {
+  // Pulse the matching SVG flow line
+  const g = document.getElementById('flow-lines');
+  if (!g) return;
+  g.querySelectorAll('path').forEach(path => {
+    const d = path.getAttribute('data-from');
+    const t = path.getAttribute('data-to');
+    if (d === from && t === to) {
+      path.setAttribute('stroke-width', on ? '4' : '2');
+      path.setAttribute('opacity', on ? '1' : '0.7');
+    }
+  });
+}
+
+// ─── MAINTENANCE — iframe handles it, no JS needed ──────────────────────
+
+// ─── HDD / CDD — Open-Meteo (free, no API key) ─────────────────────────
+// Using Oklahoma City as the Mid-Con representative location
+const HDD_CDD_LAT = 35.47;
+const HDD_CDD_LON = -97.52;
+const HDD_CDD_LOCATION = 'OKC / MID-CON REGION';
+const BASE_TEMP_F = 65;
+
+function celsiusToF(c) { return c * 9/5 + 32; }
+
+async function fetchDegreeDays() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${HDD_CDD_LAT}&longitude=${HDD_CDD_LON}&daily=temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&forecast_days=7&timezone=America%2FChicago`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const days = data.daily;
+    const hdds = [], cdds = [], labels = [];
+
+    days.time.forEach((date, i) => {
+      const avg = (days.temperature_2m_max[i] + days.temperature_2m_min[i]) / 2;
+      const hdd = Math.max(0, BASE_TEMP_F - avg);
+      const cdd = Math.max(0, avg - BASE_TEMP_F);
+      hdds.push(Math.round(hdd * 10) / 10);
+      cdds.push(Math.round(cdd * 10) / 10);
+      const d = new Date(date + 'T12:00:00');
+      labels.push(d.toLocaleDateString('en-US', {weekday:'short'}));
+    });
+
+    // Today = index 0
+    document.getElementById('hdd-today').textContent = hdds[0].toFixed(0);
+    document.getElementById('cdd-today').textContent = cdds[0].toFixed(0);
+
+    const hddWeek = hdds.reduce((a,b)=>a+b,0).toFixed(0);
+    const cddWeek = cdds.reduce((a,b)=>a+b,0).toFixed(0);
+    document.getElementById('hdd-week-total').textContent = `7-day total: ${hddWeek}`;
+    document.getElementById('cdd-week-total').textContent = `7-day total: ${cddWeek}`;
+
+    // Bar charts
+    renderDegBars('hdd-bars', 'hdd-bar-labels', hdds, labels);
+    renderDegBars('cdd-bars', 'cdd-bar-labels', cdds, labels);
+
+    document.getElementById('hdd-cdd-location').textContent =
+      `${HDD_CDD_LOCATION}  ·  BASE ${BASE_TEMP_F}°F  ·  SOURCE: OPEN-METEO.COM  ·  UPDATED ${new Date().toLocaleTimeString()}`;
+  } catch(e) {
+    document.getElementById('hdd-today').textContent = '—';
+    document.getElementById('cdd-today').textContent = '—';
+    document.getElementById('hdd-cdd-location').textContent = 'WEATHER DATA UNAVAILABLE';
+  }
+}
+
+function renderDegBars(barId, labelId, values, labels) {
+  const barEl = document.getElementById(barId);
+  const lblEl = document.getElementById(labelId);
+  if (!barEl || !lblEl) return;
+  const max = Math.max(...values, 1);
+  barEl.innerHTML = '';
+  lblEl.innerHTML = '';
+  values.forEach((v, i) => {
+    const bar = document.createElement('div');
+    bar.className = 'dc-bar';
+    bar.style.height = Math.max(2, (v / max) * 28) + 'px';
+    bar.title = `${labels[i]}: ${v}`;
+    barEl.appendChild(bar);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'dc-bar-lbl';
+    lbl.textContent = labels[i].charAt(0);
+    lblEl.appendChild(lbl);
+  });
+}
+
+// Fetch on load, refresh every 30 minutes
+fetchDegreeDays();
+setInterval(fetchDegreeDays, 30 * 60 * 1000);
+
+// init
+renderPriceTable();
+buildTransportOverlays();
+drawFlowLines();
+</script>
+</body>
+</html>
